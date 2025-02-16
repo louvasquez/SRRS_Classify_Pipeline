@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  nifi:
+    image: apache/nifi:2.0.0
+    ports:
+      - "8443:8443"
+    environment:
+      NIFI_WEB_HTTPS_PORT: 8443
+      SINGLE_USER_CREDENTIALS_USERNAME: nifi
+      SINGLE_USER_CREDENTIALS_PASSWORD: aidatastreams
+    volumes:
+      - ../srrs_data:/opt/nifi/nifi-current/app-data
+      - autoflows:/opt/nifi/nifi-current/autoflows
+      - app-scripts:/opt/nifi/nifi-current/app-scripts
+    depends_on:
+      - ai
+
+  ai:
+    build: ./ai
+    ports:
+      - "8000:8000"
+    environment:
+      - MODEL_NAME=dslim/bert-base-NER

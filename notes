@@ -1,0 +1,14 @@
+
+docker-compose down
+docker-compose up --build -d --remove-orphans
+docker-compose logs nifi -f
+
+cat "$HOME/Downloads/$(ls -ltr ~/Downloads | grep 'SRRS.*json' | tail -1| sed 's/.*SRRS/SRRS/')" | jq '.' | > SRRS.json
+
+https://www.ncei.noaa.gov/data/service-records-retention-system/access/anx/2025/01/27/00/
+
+docker cp split_messages_exec.py nifi:/opt/nifi/nifi-current/app-scripts/split_messages_exec.py
+docker cp test_stream.py nifi:/opt/nifi/nifi-current/app-scripts/test_stream.py
+
+
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0x9b in position 1241: invalid start byte
