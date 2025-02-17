@@ -1,5 +1,5 @@
 fastapi
 uvicorn
-transformers
+transformers[torch]
 torch
 datasets

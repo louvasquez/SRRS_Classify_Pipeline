@@ -1,17 +1,27 @@
 
+# restart all
 docker-compose down
 docker-compose up --build -d --remove-orphans
 docker-compose logs nifi -f
 
-cat "$HOME/Downloads/$(ls -ltr ~/Downloads | grep 'SRRS.*json' | tail -1| sed 's/.*SRRS/SRRS/')" | jq '.' | > SRRS.json
+# restart just part
+docker-compose up --build -d ai
+docker-compose logs ai -f
 
+# move latest SRRS from downloads to flows dir
+cat "$HOME/Downloads/$(ls -ltr ~/Downloads | grep 'SRRS.*json' | tail -1| sed 's/.*SRRS/SRRS/')" | jq '.' | > autoflows/SRRS.json
+
+# download ANX
 https://www.ncei.noaa.gov/data/service-records-retention-system/access/anx/2025/01/27/00/
+
 
 docker cp split_messages_exec.py nifi:/opt/nifi/nifi-current/app-scripts/split_messages_exec.py
 docker cp test_stream.py nifi:/opt/nifi/nifi-current/app-scripts/test_stream.py
 
-
 UnicodeDecodeError: 'utf-8' codec can't decode byte 0x9b in position 1241: invalid start byte
+
+
+
 
 
 
@@ -24,3 +34,35 @@ positionY: -3
 clientId: c0be2e7f-f21b-4d43-aafa-cb7face9aebb
 disconnectedNodeAcknowledged: false
 file: (binary)
+
+
+
+
+explanation of messages
+https://www.geoplatform.gov/metadata/d45c94e0-3c9d-4f65-9ed1-851b763b50be
+https://www.ncei.noaa.gov/metadata/geoportal/rest/metadata/item/gov.noaa.ncdc:C00035/html
+DSI-9949
+In 2001 SRRS (DSI-9949) was succeeded by the Gateway SRRS (DSI-9957; C00583). NWS products after 2001 can be obtained from that system, from NCEI.
+https://www.ncei.noaa.gov/metadata/geoportal/rest/metadata/item/gov.noaa.ncdc:C00035/xml
+
+passed xml to chatgpt and requested labels for model inference and training
+
+
+
+# headers not at line begin
+22273 00270 20402 334// 40402=****0000000238****
+22200 06120 2//// 80100=****0000000244****
+22200 06120 2//// 80100=****0000000238****
+22200 06120 2//// 80100=****0000000238****
+22200 06120 2//// 80100=****0000000146****
+22273 00270 20402 334// 40402 80230=****0000002127****
+222// 0//// 2//// 3//// 4//// 5//// 6//// 8//// ICE /////=****0000000146****
+22273 00270 20402 334// 40402 80230=****0000039785****
+METAR VECC 270000Z 00000KT 2400 BR FEW100 16/12 Q1012 NOSIG=****0000000485****
+METAR VOTR 261200Z 07008KT 5000 HZ FEW016 SCT100 29/21 Q1009 NOSIG=****0000000078****
+METAR VAUD 270000Z 23002KT 3000 BR NSC 06/04 Q1015 NOSIG=****0000000078****
+METAR VERC 270000Z 29004KT 3000 HZ NSC 10/02 Q1015 NOSIG=****0000000078****
+METAR VAAU 270000Z 00000KT 2000 HZ NSC 16/15 Q1013 NOSIG=****0000000078****
+METAR VANP 270000Z 31002KT 3000 HZ NSC 16/11 Q1012 NOSIG=****0000000078****
+METAR VABB 270000Z 10004KT 2100 HZ NSC 25/20 Q1009 NOSIG=****0000000078****
+METAR VIDP 270000Z 00000KT 3000 BR NSC 09/08 Q1013 NOSIG=****0000000060****

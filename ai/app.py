@@ -1,9 +1,11 @@
-import logging
-import os
-from fastapi import FastAPI, Request
-from transformers import AutoTokenizer, AutoModelForTokenClassification, TrainingArguments, Trainer, pipeline
 from datasets import load_dataset, Dataset
+from fastapi import FastAPI, Request
+from fastapi.encoders import jsonable_encoder
+import logging
+import numpy as np
+import os
 import torch
+from transformers import AutoTokenizer, AutoModelForTokenClassification, TrainingArguments, Trainer, pipeline
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -21,16 +23,58 @@ app = FastAPI()
 #
 
 
-
+# labels from passing xml of dataset (C00035) into NLP
+# https://www.ncei.noaa.gov/metadata/geoportal/rest/metadata/item/gov.noaa.ncdc:C00035/xml
+# label2id = {
+#     "O": 0,
+#     "B-REPORT_TYPE": 1,
+#     "I-REPORT_TYPE": 2,
+#     "B-DATA_ELEMENT": 3,
+#     "I-DATA_ELEMENT": 4,
+#     "B-ORGANIZATION": 5,
+#     "I-ORGANIZATION": 6,
+#     "B-DATE": 7,
+#     "I-DATE": 8,
+#     "B-TIME": 9,
+#     "I-TIME": 10,
+#     "B-LOCATION": 11,
+#     "I-LOCATION": 12
+# }
+label2id = {
+  "O": 0,
+  "B-REPORT_TYPE": 1,
+  "I-REPORT_TYPE": 2,
+  "B-DATA_ELEMENT": 3,
+  "I-DATA_ELEMENT": 4,
+  "B-ORGANIZATION": 5,
+  "I-ORGANIZATION": 6,
+  "B-DATE": 7,
+  "I-DATE": 8,
+  "B-TIME": 9,
+  "I-TIME": 10,
+  "B-LOCATION": 11,
+  "I-LOCATION": 12,
+  "B-FORECAST_TYPE": 13,
+  "I-FORECAST_TYPE": 14,
+  "B-WEATHER_EVENT": 15,
+  "I-WEATHER_EVENT": 16,
+  "B-OBSERVATION_TYPE": 17,
+  "I-OBSERVATION_TYPE": 18
+}
+id2label = {v: k for k, v in label2id.items()}
 
 # Load tokenizer and model
 tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-model_path = "./trained_model_label"
+model_path = "./trained-model-label"
 
 if os.path.exists(model_path):
-    model = AutoModelForTokenClassification.from_pretrained(model_path)
+    model_label = AutoModelForTokenClassification.from_pretrained(model_path,
+        label2id=label2id,
+        id2label=id2label)
 else:
-    model = AutoModelForTokenClassification.from_pretrained("bert-base-uncased", num_labels=5)
+    model_label = AutoModelForTokenClassification.from_pretrained("bert-base-uncased", num_labels=len(label2id),
+                    label2id=label2id,
+                    id2label=id2label)
 
 # Buffer for training data
 training_buffer = []
@@ -49,8 +93,8 @@ async def collect_message(request: Request):
 
 @app.post("/train_label")
 async def train_label():
-    if len(training_buffer) < THRESHOLD:
-        return {"status": f"Not enough messages to train. Current count: {len(training_buffer)}"}
+    # if len(training_buffer) < THRESHOLD:
+    #     return {"status": f"Not enough messages to train. Current count: {len(training_buffer)}"}
     logger.info("training label model")
 
     # Prepare dataset
@@ -68,7 +112,7 @@ async def train_label():
     )
 
     trainer = Trainer(
-        model=model,
+        model=model_label,
         args=training_args,
         train_dataset=tokenized_datasets,
     )
@@ -78,13 +122,18 @@ async def train_label():
     training_buffer.clear()
     return {"status": "Training complete and model saved."}
 
+
+# Load model and tokenizer at startup
+label_pipeline = pipeline("ner", model=model_label, tokenizer=tokenizer)
+
 @app.post("/infer_label")
 async def infer_label(request: Request):
+    logger.info("inferring label")
     data = await request.json()
     message = data.get("message")
 
-    model = AutoModelForTokenClassification.from_pretrained(model_path)
-    label_pipeline = pipeline("ner", model=model, tokenizer=tokenizer)
-
     result = label_pipeline(message)
-    return {"labels": result}
+    logger.info("done inferring")
+
+    return jsonable_encoder(result, custom_encoder={np.float32: float})
+
