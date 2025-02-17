@@ -12,3 +12,15 @@ docker cp test_stream.py nifi:/opt/nifi/nifi-current/app-scripts/test_stream.py
 
 
 UnicodeDecodeError: 'utf-8' codec can't decode byte 0x9b in position 1241: invalid start byte
+
+
+
+
+upload...
+id: 105ff36d-0195-1000-27bf-3a3f48ae52b8
+groupName: SRRS2
+positionX: 545
+positionY: -3
+clientId: c0be2e7f-f21b-4d43-aafa-cb7face9aebb
+disconnectedNodeAcknowledged: false
+file: (binary)

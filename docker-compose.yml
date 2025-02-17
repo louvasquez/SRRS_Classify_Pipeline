@@ -1,8 +1,13 @@
 version: '3.8'
 
+x-variables:
+  nifi_home: &nifi_home /opt/nifi/nifi-current
+  user: &user nifi
+  password: &password aidatastreams
+
 services:
   nifi:
-    image: apache/nifi:2.0.0
+    build: .
     ports:
       - "8443:8443"
     environment:
@@ -10,11 +15,18 @@ services:
       SINGLE_USER_CREDENTIALS_USERNAME: nifi
       SINGLE_USER_CREDENTIALS_PASSWORD: aidatastreams
     volumes:
-      - ../srrs_data:/opt/nifi/nifi-current/app-data
-      - autoflows:/opt/nifi/nifi-current/autoflows
-      - app-scripts:/opt/nifi/nifi-current/app-scripts
+      - ${SRRS_DATA_PATH}/srrs_data:/opt/nifi/nifi-current/app-data
+      - ${PROJ_DIR}/autoflows:/opt/nifi/nifi-current/autoflows
+      - ${PROJ_DIR}/app-scripts:/opt/nifi/nifi-current/app-scripts
     depends_on:
       - ai
+    entrypoint: ["/bin/bash", "-c", "/opt/nifi/nifi-current/app-scripts/start_more.sh"]
+    # entrypoint: >
+    #   /bin/bash -c "
+    #   /opt/nifi/nifi-current/bin/nifi.sh run &
+    #   tail -f /dev/null"
+
+
 
   ai:
     build: ./ai
