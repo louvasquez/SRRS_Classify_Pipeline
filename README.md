@@ -1,4 +1,4 @@
-# WIP SRRS Classify and NiFi Pipeline
+# [WIP] SRRS Classify and NiFi Pipeline
 
 Rudimentary attempts at
 - Classify ANX messages (bulletins) in Jupyter notebook
@@ -32,7 +32,7 @@ TODO
 - improve classifier model loss
 - add classifier infer to API for NiFi flow inference
 
-# [WIP-ish] NiFi Inferrer (bert NER)
+# [WIP] NiFi Inferrer (bert NER)
 
 2 parts
 - *NiFi*: Streams anx messages into API train
