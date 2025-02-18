@@ -17,29 +17,16 @@ app = FastAPI()
 # sequence
 #
 
+# Not here yet
 
 #
 # token classification
 #
 
+# does add labels but very badly
+# attempting to classify messages first, then work on labeling them separately based on message class
 
 # labels from passing xml of dataset (C00035) into NLP
-# https://www.ncei.noaa.gov/metadata/geoportal/rest/metadata/item/gov.noaa.ncdc:C00035/xml
-# label2id = {
-#     "O": 0,
-#     "B-REPORT_TYPE": 1,
-#     "I-REPORT_TYPE": 2,
-#     "B-DATA_ELEMENT": 3,
-#     "I-DATA_ELEMENT": 4,
-#     "B-ORGANIZATION": 5,
-#     "I-ORGANIZATION": 6,
-#     "B-DATE": 7,
-#     "I-DATE": 8,
-#     "B-TIME": 9,
-#     "I-TIME": 10,
-#     "B-LOCATION": 11,
-#     "I-LOCATION": 12
-# }
 label2id = {
   "O": 0,
   "B-REPORT_TYPE": 1,
