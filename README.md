@@ -1,16 +1,16 @@
 # [WIP] SRRS Classify and NiFi Pipeline
 
 Rudimentary attempts at
-- Classify ANX messages (bulletins) in Jupyter notebook
-- NiFi + FastAPI Infer NER from streaming messages
+- Classify and Label ANX messages (bulletins) in Jupyter notebook
+- NiFi + FastAPI train and infer NER from streaming messages
 
 What works
-- jupyter notebook can train a model
+- jupyter notebook can train a model to classify
 - nifi pipeline can stream messages into API for (BAD) label training (NER)
 
 **AI Helped me**
 
-# [WIP] Classifier (ipynb)
+# Classifier (ipynb)
 (see `jupyter/`)
 
 Creates classifier model
@@ -31,6 +31,13 @@ Current Stats
 TODO
 - improve classifier model loss
 - add classifier infer to API for NiFi flow inference
+
+# NER/Labeler (ipynb)
+(see `jupyter/`)
+
+- (towards bottom) train spacy NER model
+- (towards bottom) infer labels
+
 
 # [WIP] NiFi Inferrer (bert NER)
 
